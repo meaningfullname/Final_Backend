@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BMI Calculator</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body style="background-color: #121212;">
+<header class="header py-3">
+  <div class="container d-flex justify-content-between align-items-center">
+    <nav class="nav">
+      <div class="nav-logo" style="padding-right: 20%">
+        <p>COMBINED</p>
+      </div>
+      <div class="nav-menu" id="navMenu">
+        <ul>
+          <li><a href="/dashboard" class="link">Home</a></li>
+          <li><a href="/sendEmail" class="link">SendEmail</a></li>
+          <li><a href="/calculatebmi" class="link active">BMI</a></li>
+          <li><a href="/qr" class="link">QR</a></li>
+          <li><a href="/blog" class="link">Blog</a></li>
+          <li><a href="/weather" class="link">Weather</a></li>
+
+        </ul>
+      </div>
+      <div style="padding-left: 13%" class="nav-button">
+        <button class="btn white-btn" id="loginBtn"><a href="/" class="link">Log Out</a></button>
+      </div>
+    </nav>
+  </div>
+</header>
+<h1 style="text-align: center; color: white">BMI Calculator</h1>
+<form id="bmiForm">
+  <input type="number" id="weight" placeholder="Enter your weight (kg)" required>
+  <input type="number" id="height" placeholder="Enter your height (cm)" required>
+  <button type="submit">Calculate BMI</button>
+</form>
+
+<div id="result" style="display: none;">
+  <p>Your BMI is: <span id="bmiValue"></span></p>
+  <p>Category: <span id="bmiCategory"></span></p>
+  <button id="goBack">Go Back</button>
+</div>
+
+<script>
+  document.getElementById('bmiForm').addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+    const weight = parseFloat(document.getElementById('weight').value);
+    const height = parseFloat(document.getElementById('height').value);
+
+    if (weight <= 0 || height <= 0 || isNaN(weight) || isNaN(height)) {
+      alert('Please enter valid positive numbers for weight and height.');
+      return;
+    }
+
+    const response = await fetch('/calculatebmi', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ weight, height })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message);
+      return;
+    }
+
+    document.getElementById('bmiValue').innerText = data.bmi;
+    document.getElementById('bmiCategory').innerText = data.category;
+    document.getElementById('result').style.display = 'block';
+    document.getElementById('bmiForm').style.display = 'none';
+  });
+
+  document.getElementById('goBack').addEventListener('click', function () {
+    document.getElementById('bmiForm').style.display = 'block';
+    document.getElementById('result').style.display = 'none';
+    document.getElementById('weight').value = '';
+    document.getElementById('height').value = '';
+  });
+</script>
+</body>
+</html>

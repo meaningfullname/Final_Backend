@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Send Email</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+
+<body style="background-color: #121212;">
+<header class="header py-3">
+  <div class="container d-flex justify-content-between align-items-center">
+    <nav class="nav">
+      <div class="nav-logo" style="padding-right: 20%">
+        <p>COMBINED</p>
+      </div>
+      <div class="nav-menu" id="navMenu">
+        <ul>
+          <li><a href="/dashboard" class="link">Home</a></li>
+          <li><a href="/sendEmail" class="link active">SendEmail</a></li>
+          <li><a href="/calculatebmi" class="link">BMI</a></li>
+          <li><a href="/qr" class="link">QR</a></li>
+          <li><a href="/blog" class="link">Blog</a></li>
+          <li><a href="/weather" class="link">Weather</a></li>
+
+
+        </ul>
+      </div>
+      <div style="padding-left: 13%" class="nav-button">
+        <button class="btn white-btn" id="loginBtn"><a href="/" class="link">Log Out</a></button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<h2 style="text-align: center; color: white">Send an Email</h2>
+<form id="emailForm">
+  <input type="email" id="to" placeholder="Recipient Email" required><br>
+  <input type="text" id="subject" placeholder="Subject" required><br>
+  <textarea id="text" placeholder="Message" required></textarea><br>
+  <button type="submit">Send Email</button>
+</form>
+<p id="result"></p>
+
+<script>
+  document.getElementById("emailForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const to = document.getElementById("to").value;
+    const subject = document.getElementById("subject").value;
+    const text = document.getElementById("text").value;
+
+    const response = await fetch("/sendEmail", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ to, subject, text }),
+    });
+
+    const result = await response.json();
+
+    alert(result.message);
+
+    if (response.ok) {
+      document.getElementById("emailForm").reset();
+    }
+  });
+</script>
+</body>
+
+</html>

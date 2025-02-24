@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Code Generator</title>
+  <link rel="stylesheet" href="/styles.css">
+
+</head>
+<body style="background-color: #121212;">
+<header class="header py-3">
+  <div class="container d-flex justify-content-between align-items-center">
+    <nav class="nav">
+      <div class="nav-logo" style="padding-right: 20%">
+        <p>COMBINED</p>
+      </div>
+      <div class="nav-menu" id="navMenu">
+        <ul>
+          <li><a href="/dashboard" class="link">Home</a></li>
+          <li><a href="/sendEmail" class="link">SendEmail</a></li>
+          <li><a href="/calculatebmi" class="link">BMI</a></li>
+          <li><a href="/qr" class="link active">QR</a></li>
+          <li><a href="/blog" class="link">Blog</a></li>
+          <li><a href="/weather" class="link">Weather</a></li>
+
+
+
+        </ul>
+      </div>
+      <div style="padding-left: 13%" class="nav-button">
+        <button class="btn white-btn" id="loginBtn"><a href="/" class="link">Log Out</a></button>
+      </div>
+    </nav>
+  </div>
+</header>
+<h2 style="text-align: center">QR Code Generator</h2>
+<form id="qr-form">
+  <label for="url">Enter URL:</label>
+  <input type="text" id="url" name="url" required>
+  <button type="submit">Generate QR Code</button>
+</form>
+<div id="qr-result">
+  <h3>Generated QR Code:</h3>
+  <img id="qr-image" src="" alt="QR Code" style="display: none;">
+</div>
+
+<script>
+  document.getElementById("qr-form").addEventListener("submit", async function(event) {
+    event.preventDefault();
+    const url = document.getElementById("url").value;
+
+    if (!url.trim()) {
+      alert("Please enter a valid URL.");
+      return;
+    }
+
+    const response = await fetch("/generate-qr", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url })
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      document.getElementById("qr-image").src = data.qrImage;
+      document.getElementById("qr-image").style.display = "block";
+    } else {
+      alert(data.message);
+    }
+  });
+</script>
+</body>
+</html>

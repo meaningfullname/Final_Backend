@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog System</title>
+  <link rel="stylesheet" href="/styles.css">
+
+  <style>
+    body { font-family: Arial, sans-serif;}
+    input, textarea, button { display: block; width: 100%; margin: 10px 0; padding: 10px; }
+    .blog-post { border: 1px solid #ddd; padding: 10px; margin: 10px 0; }
+    .delete-btn { background: red; color: white; cursor: pointer; border: none; padding: 5px; }
+  </style>
+</head>
+<body style="background-color: #121212;">
+<header class="header py-3">
+  <div class="container d-flex justify-content-between align-items-center">
+    <nav class="nav">
+      <div class="nav-logo" style="padding-right: 20%">
+        <p>COMBINED</p>
+      </div>
+      <div class="nav-menu" id="navMenu">
+        <ul>
+          <li><a href="/dashboard" class="link">Home</a></li>
+          <li><a href="/sendEmail" class="link">SendEmail</a></li>
+          <li><a href="/calculatebmi" class="link">BMI</a></li>
+          <li><a href="/qr" class="link">QR</a></li>
+          <li><a href="/blog" class="link active">Blog</a></li>
+          <li><a href="/weather" class="link">Weather</a></li>
+
+
+        </ul>
+      </div>
+      <div style="padding-left: 13%" class="nav-button">
+        <button class="btn white-btn" id="loginBtn"><a href="/" class="link">Log Out</a></button>
+      </div>
+    </nav>
+  </div>
+</header>
+<h2 style="text-align: center">Create a New Blog</h2>
+<input type="text" id="title" placeholder="Title">
+<textarea id="body" placeholder="Content"></textarea>
+<input type="text" id="author" placeholder="Author (optional)">
+<button onclick="addBlog()">Create Blog</button>
+
+<h2 style="text-align: center">All Blogs</h2>
+<div id="blogs"></div>
+
+<script>
+  async function fetchBlogs() {
+    const res = await fetch('/blogs');
+    const blogs = await res.json();
+    document.getElementById('blogs').innerHTML = blogs.map(blog => `
+                <div class="blog-post">
+                    <h3>${blog.title}</h3>
+                    <p>${blog.body}</p>
+                    <small>By ${blog.author || "Anonymous"} | ${new Date(blog.createdAt).toLocaleString()}</small>
+                    <button class="delete-btn" onclick="deleteBlog('${blog._id}')">Delete</button>
+                </div>
+            `).join('');
+  }
+
+  async function addBlog() {
+    const title = document.getElementById('title').value;
+    const body = document.getElementById('body').value;
+    const author = document.getElementById('author').value;
+
+    const res = await fetch('/blogs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, body, author })
+    });
+
+    if (res.ok) {
+      document.getElementById('title').value = '';
+      document.getElementById('body').value = '';
+      document.getElementById('author').value = '';
+      fetchBlogs();
+    }
+  }
+
+  async function deleteBlog(id) {
+    await fetch(`/blogs/${id}`, { method: 'DELETE' });
+    fetchBlogs();
+  }
+
+  fetchBlogs();
+</script>
+</body>
+</html>
